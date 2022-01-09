@@ -1,25 +1,55 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react'
 
-function App() {
+const Header = ({ title }) => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h1> {title} </h1>
     </div>
   );
 }
 
-export default App;
+const FeedButton = ({val, setter, text}) => {
+  return (
+    <button onClick={() => setter(val+1)}> {text} </button>
+  );
+}
+
+const Inputs = ({good, neutral, bad, setGood, setNeutral, setBad}) => {
+  return (
+    <div>
+      <FeedButton val={good} setter={setGood} text={"good"} />
+      <FeedButton val={neutral} setter={setNeutral} text={"neutral"} />
+      <FeedButton val={bad} setter={setBad} text={"bad"} />
+    </div>
+  );
+}
+
+const Stats = ({good, neutral, bad}) => {
+  return (
+    <div>
+      <h1> statistics </h1>
+      <p>good {good}</p>
+      <p>neutral {neutral}</p>
+      <p>bad {bad}</p>
+    </div>
+  );
+}
+
+const App = () => {
+
+  const title = "give feedback <3";
+  // save clicks of each button to its own state
+  const [good, setGood] = useState(0)
+  const [neutral, setNeutral] = useState(0)
+  const [bad, setBad] = useState(0)
+
+  return (
+    <div>
+      <Header title={title} />
+      <Inputs good={good} neutral={neutral} bad={bad} setGood={setGood} setNeutral={setNeutral} setBad={setBad} />
+      <Stats good={good} neutral={neutral} bad={bad} />
+    </div>
+  )
+}
+
+export default App
