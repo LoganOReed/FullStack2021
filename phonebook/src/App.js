@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
 import Filter from './components/Filter'
+import personService from './services/persons'
 
 
 
@@ -24,19 +24,35 @@ const App = () => {
     e.preventDefault()  //stop the program from refreshing the page
 
     // add newName to persons if it is a new contact
-    if(persons.find( p => p.name === newName) !== undefined){
-      alert(`${newName} is already in the phonebook`)
+    let p = persons.find( p => p.name === newName)
+    if(p !== undefined){
+      //if the number is different ask if user would like to update
+      if(p.number !== newNumber){
+        if(window.confirm(`Would you like to update ${p.name}'s number to ${newNumber}?`)){
+          const changedPerson = { ...p, number: newNumber}
+          //update persons
+          personService
+          .update(p.id, changedPerson)
+          .then(returnedPerson => {
+            //map unchanged elem to themselves and changed to new one
+            setPersons(persons.map(person => person.id !== p.id ? person : returnedPerson))
+            setNewName('')
+            setNewNumber('')
+          })
+        }
+      }
     }
     else{
-      setPersons(persons.concat(newPerson))
-    }
-
-    //send this information to the server
-    axios
-      .post('http://localhost:3001/persons', newPerson)
-      .then(response => {
-        console.log(response)
+      //send this information to the server
+      personService
+        .create(newPerson)
+        .then(returnedPerson => {
+          setPersons(persons.concat(returnedPerson))
+          //clear input fields
+          setNewName('')
+          setNewNumber('')
       })
+    }
   }
 
   const handleSearchChange = e => {
@@ -52,14 +68,11 @@ const App = () => {
   }
 
   useEffect(() => {
-    if(persons.length === 0){
-      axios
-        .get('http://localhost:3001/persons')
-        .then(response => {
-          setPersons(response.data)
-          console.log(persons)
+    personService
+      .getAll()
+      .then(initPersons => {
+        setPersons(initPersons)
       })
-    }
   })
 
   return (
