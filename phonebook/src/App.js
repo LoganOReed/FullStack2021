@@ -34,10 +34,10 @@ const App = () => {
           personService
           .update(p.id, changedPerson)
           .then(returnedPerson => {
-            //map unchanged elem to themselves and changed to new one
-            setPersons(persons.map(person => person.id !== p.id ? person : returnedPerson))
             setNewName('')
             setNewNumber('')
+            //map unchanged elem to themselves and changed to new one
+            setPersons(persons.map(person => person.id !== p.id ? person : returnedPerson))
           })
         }
       }
@@ -47,10 +47,10 @@ const App = () => {
       personService
         .create(newPerson)
         .then(returnedPerson => {
-          setPersons(persons.concat(returnedPerson))
           //clear input fields
           setNewName('')
           setNewNumber('')
+          setPersons(persons.concat(returnedPerson))
       })
     }
   }
@@ -65,6 +65,16 @@ const App = () => {
 
   const handleNumberSubmit = e => {
     setNewNumber(e.target.value)
+  }
+
+  const handlePersonDelete = e => {
+    let id = e.target.id
+    personService
+      .remove(id)
+      .then(() => {
+        //update persons state to not include deleted object
+        setPersons(persons.filter( person => person.id !== id ))
+      })
   }
 
   useEffect(() => {
@@ -94,7 +104,7 @@ const App = () => {
       <h2>
         Numbers
       </h2>
-      <Persons persons={persons} newSearch={newSearch} />
+      <Persons persons={persons} newSearch={newSearch} handleDelete={handlePersonDelete} />
     </div>
   )
 }
